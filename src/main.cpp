@@ -30,6 +30,7 @@ void matrixMultiplicationNaive(const Matrix<double>& A,
         }
     }
 }
+
 void fillMatrix(Matrix<double>& m, double value)
 {
     auto N = m.row();
@@ -65,6 +66,26 @@ double FlopsPerSec(const Matrix<double>& A,
     return flops/seconds/ 1e9;
 }
 
+double performanceUtilization(const double c) {
+
+    // # Of Performance Cores for Mac
+    double performanceCores = 4;
+    // M3 clock speed GHz
+    double clockSpeed = 4.05;
+    // FLOPs per cycle (add and multiplication)
+    double FlopsPerCycle = 2;
+    // SIMD width for double
+    double SIMD = 2;
+
+    //peak = cores * clock_speed * FLOPs_per_cycle * SIMD_width
+    double optimizedPerformance = performanceCores * clockSpeed * FlopsPerCycle * SIMD;
+
+    // c is FlopsPerSecond
+    double performanceOptimized = (c/optimizedPerformance) * 100;
+
+    return performanceOptimized;
+}
+
 int main()
 {
     // Create three 512x512 matrices
@@ -74,7 +95,11 @@ int main()
     // Fil A and B with 1.0
     fillMatrix(A,1.0);
     fillMatrix(B,1.0);
-    // FlopsperSec
-    std::cout << FlopsPerSec(A,B,C) << '\n';
+    double gflops = FlopsPerSec(A, B, C);
+    double utilization = performanceUtilization(gflops);
+
+    std::cout << "Gflops/sec:  " << gflops << '\n';
+    std::cout << "Peak:        " << 64.8 << '\n';
+    std::cout << "Utilization: " << utilization << "%\n";
     return 0;
 }
